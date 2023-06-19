@@ -176,12 +176,12 @@ class proxy_HTTP_Client:
     def fix_client_header(self):
         """"""
         self.logger.log('*** Replacing values in client header...')
-        if self.config.has_key('CLIENT_HEADER'):
+        if 'CLIENT_HEADER' in self.config:
             for i in self.config['CLIENT_HEADER'].keys():
                 self.client_head_obj.del_param(i)
                 self.client_head_obj.add_param_value(i, self.config['CLIENT_HEADER'][i])
             self.logger.log('Done.\n')
-            self.logger.log('*** New client header:\n=====\n' + self.client_head_obj.__repr__())
+            self.logger.log('*** New client header:\n=====\n' + self.client_head_obj.__repr__().decode())
         else:
             self.logger.log('No need.\n*** There is no "CLIENT_HEADER" section in server.cfg.\n')
 
@@ -256,7 +256,7 @@ class proxy_HTTP_Client:
         if socket_data:
             self.logger_bin_client.log(socket_data)
 
-        self.client_buffer = self.client_buffer + socket_data
+        self.client_buffer = self.client_buffer + (socket_data.decode() if isinstance(socket_data, bytes) else socket_data)
 
         if not self.client_head_obj and not self.tunnel_mode:
             self.client_head_obj, rest = http_header.extract_client_header(self.client_buffer)
@@ -264,7 +264,7 @@ class proxy_HTTP_Client:
             if self.client_head_obj:
                 self.logger.log("*** Got client request header.\n")
                 self.client_buffer = rest
-                self.logger.log('*** Client header:\n=====\n' + self.client_head_obj.__repr__())
+                self.logger.log('*** Client header:\n=====\n'.encode() + self.client_head_obj.__repr__())
                 self.guess_client_data_length()
 
                 # mask real values and do transforms

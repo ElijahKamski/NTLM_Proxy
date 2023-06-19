@@ -40,9 +40,5 @@ config = config_affairs.arrange(conf)
 
 # --------------------------------------------------------------
 # let's run it
-print(U32())
-a = U32()
-a += 1
-print(a)
 serv = server.AuthProxyServer(config)
 serv.run()
