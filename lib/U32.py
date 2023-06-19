@@ -43,32 +43,50 @@ class U32:
     def __chr__(self):
         return chr(norm(self.v))
 
-    def __add__(self, b):
+    def __add__(self, b: int):
         r = U32()
-        r.v = C + norm(self.v + b.v)
+        if isinstance(b, self.__class__):
+            r.v = C + norm(self.v + b.v)
+        else:
+            r.v = C + norm(self.v + b)
         return r
 
     def __sub__(self, b):
         r = U32()
-        if self.v < b.v:
-            r.v = C + norm(0x100000000 - (b.v - self.v))
+        if isinstance(b, self.__class__):
+            if self.v < b.v:
+                r.v = C + norm(0x100000000 - (b.v - self.v))
+            else:
+                r.v = C + norm(self.v - b.v)
         else:
-            r.v = C + norm(self.v - b.v)
+            if self.v < b:
+                r.v = C + norm(0x100000000 - (b - self.v))
+            else:
+                r.v = C + norm(self.v - b)
         return r
 
     def __mul__(self, b):
         r = U32()
-        r.v = C + norm(self.v * b.v)
+        if isinstance(b, self.__class__):
+            r.v = C + norm(self.v * b.v)
+        else:
+            r.v = C + norm(self.v * b)
         return r
 
     def __div__(self, b):
         r = U32()
-        r.v = C + (norm(self.v) / norm(b.v))
+        if isinstance(b, self.__class__):
+            r.v = C + (norm(self.v) / norm(b.v))
+        else:
+            r.v = C + (norm(self.v) / norm(b))
         return r
 
     def __mod__(self, b):
         r = U32()
-        r.v = C + (norm(self.v) % norm(b.v))
+        if isinstance(b, self.__class__):
+            r.v = C + (norm(self.v) % norm(b.v))
+        else:
+            r.v = C + (norm(self.v) % norm(b))
         return r
 
     def __neg__(self):
@@ -97,17 +115,26 @@ class U32:
 
     def __and__(self, b):
         r = U32()
-        r.v = C + norm(self.v & b.v)
+        if isinstance(b, self.__class__):
+            r.v = C + norm(self.v & b.v)
+        else:
+            r.v = C + norm(self.v & b)
         return r
 
     def __or__(self, b):
         r = U32()
-        r.v = C + norm(self.v | b.v)
+        if isinstance(b, self.__class__):
+            r.v = C + norm(self.v | b.v)
+        else:
+            r.v = C + norm(self.v | b)
         return r
 
     def __xor__(self, b):
         r = U32()
-        r.v = C + norm(self.v ^ b.v)
+        if isinstance(b, self.__class__):
+            r.v = C + norm(self.v ^ b.v)
+        else:
+            r.v = C + norm(self.v ^ b)
         return r
 
     def __not__(self):
@@ -117,9 +144,16 @@ class U32:
         return norm(self.v)
 
     def __cmp__(self, b):
-        if norm(self.v) > norm(b.v):
+        if isinstance(b, self.__class__):
+            if norm(self.v) > norm(b.v):
+                return 1
+            elif norm(self.v) < norm(b.v):
+                return -1
+            else:
+                return 0
+        if norm(self.v) > norm(b):
             return 1
-        elif norm(self.v) < norm(b.v):
+        elif norm(self.v) < norm(b):
             return -1
         else:
             return 0
