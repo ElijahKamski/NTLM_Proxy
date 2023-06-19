@@ -118,7 +118,7 @@ def bytes2int(bytes):
 def int2hex_str(number_int16):
     """"""
     res = '0x'
-    ph = int(number_int16) / 256
+    ph = int(number_int16) // 256
     res = res + hd[ph // 16]
     res = res + hd[ph - ((ph // 16) * 16)]
 

@@ -17,7 +17,6 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #
 
-import string
 import urllib.parse as urlparse
 
 http_debug_file_name = 'http.debug'
@@ -27,8 +26,8 @@ http_debug_file_name = 'http.debug'
 # tests client's header for correctness
 def test_client_http_header(header_str):
     ""
-    request = string.split(header_str, '\012')[0]
-    parts = string.split(request)
+    request = header_str.split('\012')[0]
+    parts = request.split()
 
     # we have to have at least 3 words in the request
     # poor check
@@ -42,8 +41,8 @@ def test_client_http_header(header_str):
 # tests server's response header for correctness
 def test_server_http_header(header_str):
     ""
-    response = string.split(header_str, '\012')[0]
-    parts = string.split(response)
+    response = header_str.split('\012')[0]
+    parts = response.split()
 
     # we have to have at least 2 words in the response
     # poor check
@@ -57,16 +56,16 @@ def test_server_http_header(header_str):
 def extract_http_header_str(buffer):
     ""
     # let's remove possible leading newlines
-    t = string.lstrip(buffer)
+    t = buffer.lstrip()
 
     # searching for the RFC header's end
     delimiter = '\015\012\015\012'
-    header_end = string.find(t, delimiter)
+    header_end = t.find(delimiter)
 
     if header_end < 0:
         # may be it is defective header made by junkbuster
         delimiter = '\012\012'
-        header_end = string.find(t, delimiter)
+        header_end = t.find(delimiter)
 
     if header_end >= 0:
         # we have found it, possibly
@@ -122,18 +121,18 @@ def extract_client_header(buffer):
 # -----------------------------------------------------------------------
 def capitalize_value_name(str):
     ""
-    tl = string.split(str, '-')
+    tl = str.split('-')
     for i in range(len(tl)):
-        tl[i] = string.capitalize(tl[i])
+        tl[i] = tl[i].capitalize()
 
-    return string.join(tl, '-')
+    return '-'.join(tl)
 
 
 # -----------------------------------------------------------------------
 # some helper classes
 # -----------------------------------------------------------------------
 class HTTP_HEAD:
-    ""
+    """"""
     pass
 
     # -------------------------------
@@ -145,29 +144,29 @@ class HTTP_HEAD:
         self.order_list = []
 
         self.head_source = head_str
-        head_str = string.strip(head_str)
-        records = string.split(head_str, '\012')
+        head_str = head_str.strip()
+        records = head_str.split('\012')
 
         # Dealing with response line
         # fields = string.split(records[0], ' ', 2)
-        t = string.split(string.strip(records[0]))
-        fields = t[:2] + [string.join(t[2:])]
+        t = records[0].strip().split()
+        fields = t[:2] + [''.join(t[2:])]
 
         self.fields = []
         for i in fields:
-            self.fields.append(string.strip(i))
+            self.fields.append(i.strip())
 
         # Dealing with params
         params = {}
         order_list = []
         for i in records[1:]:
-            parts = string.split(string.strip(i), ':', 1)
-            pname = string.lower(string.strip(parts[0]))
-            if not params.has_key(pname):
+            parts = i.strip().split(':', 1)
+            pname = parts[0].strip().lower()
+            if pname not in params:
                 params[pname] = []
-                order_list.append(string.lower(pname))
+                order_list.append(pname.lower())
             try:
-                params[pname].append(string.strip(parts[1]))
+                params[pname].append(parts[1].strip())
             except:
                 msg = "ERROR: Exception in head parsing. ValueName: '%s'" % pname
                 # print msg
@@ -178,7 +177,7 @@ class HTTP_HEAD:
 
     # -------------------------------
     def debug(self, message):
-        ""
+        """"""
         try:
             f = open(http_debug_file_name, 'a')
             f.write(message)
@@ -192,36 +191,37 @@ class HTTP_HEAD:
 
     # -------------------------------
     def copy(self):
-        ""
+        """"""
         import copy
         return copy.deepcopy(self)
 
     # -------------------------------
     def get_param_values(self, param_name):
         ""
-        param_name = string.lower(param_name)
-        if self.params.has_key(param_name):
+        param_name = param_name.lower()
+        if param_name in self.params:
             return self.params[param_name]
         else:
             return []
 
     # -------------------------------
     def del_param(self, param_name):
-        ""
-        param_name = string.lower(param_name)
-        if self.params.has_key(param_name): del self.params[param_name]
+        """"""
+        param_name = param_name.lower()
+        if param_name in self.params:
+            del self.params[param_name]
 
     # -------------------------------
     def has_param(self, param_name):
-        ""
-        param_name = string.lower(param_name)
-        return self.params.has_key(param_name)
+        """"""
+        param_name = param_name.lower()
+        return param_name in self.params
 
     # -------------------------------
     def add_param_value(self, param_name, value):
-        ""
-        param_name = string.lower(param_name)
-        if not self.params.has_key(param_name):
+        """"""
+        param_name = param_name.lower()
+        if param_name not in self.params:
             self.params[param_name] = []
         if param_name not in self.order_list:
             self.order_list.append(param_name)
@@ -229,19 +229,19 @@ class HTTP_HEAD:
 
     # -------------------------------
     def replace_param_value(self, param_name, value):
-        ""
+        """"""
         self.del_param(param_name)
         self.add_param_value(param_name, value)
 
     # -------------------------------
     def __repr__(self, delimiter='\n'):
-        ""
+        """"""
         res = ''
         cookies = ''
-        res = string.join(self.fields, ' ') + '\n'
+        res = ' '.join(self.fields) + '\n'
 
         for i in self.order_list:
-            if self.params.has_key(i):
+            if i in self.params:
                 if i == 'cookie':
                     for k in self.params[i]:
                         cookies = cookies + capitalize_value_name(i) + ': ' + k + '\n'
@@ -255,14 +255,14 @@ class HTTP_HEAD:
 
     # -------------------------------
     def send(self, socket):
-        ""
+        """"""
         # """
         res = ''
         cookies = ''
-        res = string.join(self.fields, ' ') + '\015\012'
+        res = ' '.join(self.fields) + '\015\012'
 
         for i in self.order_list:
-            if self.params.has_key(i):
+            if i in self.params:
                 if i == 'cookie':
                     for k in self.params[i]:
                         cookies = cookies + capitalize_value_name(i) + ': ' + k + '\015\012'
@@ -290,12 +290,12 @@ class HTTP_SERVER_HEAD(HTTP_HEAD):
 
     # -------------------------------
     def get_http_version(self):
-        ""
+        """"""
         return self.fields[0]
 
     # -------------------------------
     def get_http_code(self):
-        ""
+        """"""
         return self.fields[1]
 
     # -------------------------------
@@ -309,22 +309,22 @@ class HTTP_CLIENT_HEAD(HTTP_HEAD):
 
     # -------------------------------
     def get_http_version(self):
-        ""
+        """"""
         return self.fields[2]
 
     # -------------------------------
     def get_http_method(self):
-        ""
+        """"""
         return self.fields[0]
 
     # -------------------------------
     def get_http_url(self):
-        ""
+        """"""
         return self.fields[1]
 
     # -------------------------------
     def set_http_url(self, new_url):
-        ""
+        """"""
         self.fields[1] = new_url
 
     # -------------------------------
@@ -357,9 +357,9 @@ class HTTP_CLIENT_HEAD(HTTP_HEAD):
         # trying to parse user:passwd@www.some.domain:8080
         # is it needed?
         if '@' in net_location:
-            cred, net_location = string.split(net_location, '@')
+            cred, net_location = net_location.split('@')
         if ':' in net_location:
-            server, port = string.split(net_location, ':')
+            server, port = net_location.split(':')
             port = int(port)
         else:
             server = net_location

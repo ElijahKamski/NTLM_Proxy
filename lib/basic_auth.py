@@ -24,12 +24,12 @@ class basic_auther:
 
     # -----------------------------------------------------------------------
     def __init__(self):
-        ""
+        """"""
         pass
 
     # -----------------------------------------------------------------------
     def build_credentials(config_dic):
-        ""
+        """"""
 
         msg = config_dic['USER'] + ":" + config_dic['PASSWORD']
         msg = base64.encodestring(msg)
@@ -65,7 +65,7 @@ class basic_auther:
 
     # -----------------------------------------------------------------------
     def www_basic_authentication(self, connection):
-        ""
+        """"""
         connection.logger.log('*** Basic authorization in progress...\n')
 
         connection.close_rserver()
@@ -78,7 +78,7 @@ class basic_auther:
         basic_string = self.build_credentials(connection.config['GENERAL'])
 
         tmp_client_head_obj = connection.client_head_obj.copy()
-        tmp_client_head_obj.replace_param_value('Authorization', 'Basic ' + basic_sting)
+        tmp_client_head_obj.replace_param_value('Authorization', 'Basic ' + basic_string)
 
         connection.logger.log('*** Sending client header (not body) with Basic auth...')
         tmp_client_head_obj.send(connection.rserver_socket)

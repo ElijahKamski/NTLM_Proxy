@@ -20,7 +20,8 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #
 
-import os, sys
+import os
+import sys
 
 ntlmaps_dir = os.path.dirname(os.path.abspath(__file__))
 ntlmaps_libdir = ntlmaps_dir + '/lib'

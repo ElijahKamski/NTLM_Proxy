@@ -78,7 +78,7 @@ class MD4:
         dest.C = self.C
         dest.D = self.D
         dest.count = self.count
-        for i in range(self.count):
+        for i in range(int(self.count)):
             dest.buf[i] = self.buf[i]
 
         return dest
