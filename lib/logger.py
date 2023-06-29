@@ -38,6 +38,5 @@ class Logger:
             # tstr = '(' + time.strftime('%H:%M:%S', time.localtime(time.time())) + ') '
             # time.clock()
 
-            fptr = open(self.log_name, 'a')
-            fptr.write(tstr + str)
-            fptr.close()
+            with open(self.log_name, 'a', encoding="utf-8") as fptr:
+                fptr.write(tstr + str)

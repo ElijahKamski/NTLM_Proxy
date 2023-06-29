@@ -52,7 +52,7 @@ class www_HTTP_Client(proxy_client.proxy_HTTP_Client):
     def fix_client_header(self):
         """"""
         self.logger.log('*** Replacing values in client header...')
-        if self.config.has_key('CLIENT_HEADER'):
+        if 'CLIENT_HEADER' in self.config:
             for i in self.config['CLIENT_HEADER'].keys():
                 self.client_head_obj.del_param(i)
                 self.client_head_obj.add_param_value(i, self.config['CLIENT_HEADER'][i])

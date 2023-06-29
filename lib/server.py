@@ -93,9 +93,11 @@ class AuthProxyServer:
 
     # --------------------------------------------------------------
     def client_run(self, conn, addr):
+        print("IN CLIENT RUN", conn, addr)
         if self.config['GENERAL']['PARENT_PROXY']:
             # working with MS Proxy
             if self.watchUpstream:
+                print("Main branch in upstream")
                 # Locking here is really more of a 'nice to have';
                 # if performance suffers on heavy load we can trade
                 # drops here for drops on bad proxy later.
@@ -104,6 +106,7 @@ class AuthProxyServer:
                 self.monitor.threadsToKill.append(c)
                 self.monLock.release()
             else:
+                print("Else branch in upstream")
                 c = proxy_client.proxy_HTTP_Client(conn, addr, self.config)
         else:
             # working with MS IIS and any other

@@ -82,12 +82,13 @@ class proxy_HTTP_Client:
 
         # init record to debug_log
         self.logger.log('%s Version %s\n' % (
-        time.strftime('%d.%m.%Y %H:%M:%S', time.localtime(time.time())), self.config['GENERAL']['VERSION']))
+            time.strftime('%d.%m.%Y %H:%M:%S', time.localtime(time.time())), self.config['GENERAL']['VERSION']))
 
     # -----------------------------------------------------------------------
     def run(self):
         ""
-        if self.config['DEBUG']['SCR_DEBUG']: print('Connected from %s:%d' % self.client_address)
+        if self.config['DEBUG']['SCR_DEBUG']:
+            print('Connected from %s:%d' % self.client_address)
 
         while not self.stop_request:
 
@@ -144,14 +145,16 @@ class proxy_HTTP_Client:
                 self.check_tunnel_mode()
                 self.reset_client()
 
-            if self.config['DEBUG']['SCR_DEBUG']: print('\b.', end=' ')
+            if self.config['DEBUG']['SCR_DEBUG']:
+                print('\b.', end=' ')
 
             # Remote server part
             if not self.rserver_socket_closed:
                 # if there is a connection to remote server
                 self.run_rserver_loop()
 
-            if self.tunnel_mode: self.tunnel_rserver_data()
+            if self.tunnel_mode:
+                self.tunnel_rserver_data()
 
             if (not self.rserver_header_sent) and self.rserver_head_obj:
                 self.auth_routine()  # NTLM authorization
@@ -195,7 +198,7 @@ class proxy_HTTP_Client:
             raise SystemExit
         if res[0]:
             try:
-                socket_data = self.rserver_socket.recv(4096)
+                socket_data = self.rserver_socket.recv(4096).decode()
             except:
                 socket_data = ''
                 self.logger.log('*** Exception in remote server recv() happend.\n')
@@ -208,9 +211,11 @@ class proxy_HTTP_Client:
             socket_data = ''
 
         if socket_data:
-            self.logger_bin_rserver.log(socket_data)
+            self.logger_bin_rserver.log(socket_data.decode() if isinstance(socket_data, bytes) else socket_data)
 
-        self.rserver_buffer = self.rserver_buffer + socket_data
+        self.rserver_buffer = (self.rserver_buffer.encode() if isinstance(self.rserver_buffer,
+                                                                          str) else self.rserver_buffer) + (
+                                  socket_data.encode() if isinstance(socket_data, str) else socket_data)
 
         if not self.rserver_head_obj and not self.tunnel_mode:
             self.rserver_head_obj, rest = http_header.extract_server_header(self.rserver_buffer)
@@ -218,7 +223,8 @@ class proxy_HTTP_Client:
             # Code for ugly MS response without right delimiter.
             # Just '\015\012' at the end. Then it closes connection.
             if self.rserver_socket_closed and self.rserver_buffer and (not self.rserver_head_obj):
-                self.rserver_head_obj, rest = http_header.extract_server_header(self.rserver_buffer + '\015\012')
+                self.rserver_head_obj, rest = http_header.extract_server_header(
+                    self.rserver_buffer + '\015\012'.encode())
                 if self.rserver_head_obj:
                     self.logger.log(
                         "*** There is an bad MS Proxy response header with only one new line at the end in the buffer.\n")
@@ -227,7 +233,7 @@ class proxy_HTTP_Client:
             if self.rserver_head_obj:
                 self.logger.log("*** Got remote server response header.\n")
                 self.rserver_buffer = rest
-                self.logger.log('*** Remote server header:\n=====\n' + self.rserver_head_obj.__repr__())
+                self.logger.log('*** Remote server header:\n=====\n' + self.rserver_head_obj.__repr__().decode())
                 self.guess_rserver_data_length()
 
         self.check_rserver_data_length()
@@ -254,9 +260,10 @@ class proxy_HTTP_Client:
             socket_data = ''
 
         if socket_data:
-            self.logger_bin_client.log(socket_data)
+            self.logger_bin_client.log(socket_data.decode())
 
-        self.client_buffer = self.client_buffer + (socket_data.decode() if isinstance(socket_data, bytes) else socket_data)
+        self.client_buffer = self.client_buffer + (
+            socket_data.decode() if isinstance(socket_data, bytes) else socket_data)
 
         if not self.client_head_obj and not self.tunnel_mode:
             self.client_head_obj, rest = http_header.extract_client_header(self.client_buffer)
@@ -264,7 +271,7 @@ class proxy_HTTP_Client:
             if self.client_head_obj:
                 self.logger.log("*** Got client request header.\n")
                 self.client_buffer = rest
-                self.logger.log('*** Client header:\n=====\n'.encode() + self.client_head_obj.__repr__())
+                self.logger.log('*** Client header:\n=====\n' + self.client_head_obj.__repr__().decode())
                 self.guess_client_data_length()
 
                 # mask real values and do transforms
@@ -304,7 +311,7 @@ class proxy_HTTP_Client:
             try:
                 self.client_socket.send(data)
                 self.logger.log('*** Sent %d bytes to client. (all - %d, len - %d)\n' % (
-                len(data), self.rserver_all_got, self.rserver_data_length))
+                    len(data), self.rserver_all_got, self.rserver_data_length))
                 if self.rserver_all_got:
                     self.rserver_data_sent = 1
                     self.logger.log(
@@ -399,7 +406,7 @@ class proxy_HTTP_Client:
         if self.client_sent_data:
             self.logger.log(
                 "*** Sent %s bytes and have to roll back POST/PUT data transfer. (Client's buffer - %d bytes)\n" % (
-                len(self.client_sent_data), len(self.client_buffer)))
+                    len(self.client_sent_data), len(self.client_buffer)))
             self.client_buffer = self.client_sent_data + self.client_buffer
             self.client_current_data_pos = 0
             self.client_all_got = 0
@@ -631,6 +638,7 @@ class proxy_HTTP_Client:
         for i in auth:
             msg = msg + ", %s" % i
             upper_auth.append(i.upper())
+        print("In auth", auth, upper_auth, msg)
         self.logger.log('*** Authentication methods allowed: ' + msg[2:] + '\n')
 
         # NOTE that failed auth is detected now just after any failed atempt.
@@ -696,7 +704,8 @@ class proxy_HTTP_Client:
     def auth_routine(self):
         ""
         self.logger.log('*** Authentication routine started.\n')
-        code = self.rserver_head_obj.get_http_code()
+        code = self.rserver_head_obj.get_http_code().decode()
+        print("CODE: ", code)
 
         if code == '407':
             self.logger.log('*** Got Error 407 - "Proxy authentication required".\n')
@@ -707,6 +716,7 @@ class proxy_HTTP_Client:
             self.auth_401()
 
         else:
+            print('*** Authentication not required.\n')
             self.logger.log('*** Authentication not required.\n')
 
         self.logger.log('*** Authentication routine finished.\n')

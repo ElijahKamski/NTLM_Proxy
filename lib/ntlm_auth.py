@@ -55,7 +55,7 @@ class ntlm_auther:
 
         connection.connect_rserver()
 
-        NTLM_msg1 = ntlm_messages.create_message1(env)
+        NTLM_msg1 = ntlm_messages.create_message1(env).decode()
         connection.logger_auth.log(ntlm_messages.debug_message1(NTLM_msg1))
 
         tmp_client_head_obj = connection.client_head_obj.copy()
@@ -72,7 +72,7 @@ class ntlm_auther:
         if connection.client_head_obj.get_http_method() in ('POST', 'PUT'):
             tmp_client_head_obj.replace_param_value('Content-Length', '3')
 
-        connection.logger.log('*** Fake NTLM header with Msg1:\n=====\n' + tmp_client_head_obj.__repr__())
+        connection.logger.log('*** Fake NTLM header with Msg1:\n=====\n' + tmp_client_head_obj.__repr__().decode())
         connection.logger.log('*** Sending Fake NTLM header with Msg1...')
         tmp_client_head_obj.send(connection.rserver_socket)
         connection.logger.log('Done.\n')
@@ -124,7 +124,7 @@ class ntlm_auther:
         connection.logger.log('*** Sending Fake NTLM header (not body) with Msg3...')
         tmp_client_head_obj.send(connection.rserver_socket)
         connection.logger.log('Done.\n')
-        connection.logger.log('*** Fake NTLM header with Msg3:\n=====\n' + tmp_client_head_obj.__repr__())
+        connection.logger.log('*** Fake NTLM header with Msg3:\n=====\n' + tmp_client_head_obj.__repr__().decode())
 
         # upon exit all the remote server variables are reset
         # so new remote server response will be taken by the usual way in connection.run()
@@ -168,7 +168,7 @@ class ntlm_auther:
         if connection.client_head_obj.get_http_method() in ('POST', 'PUT'):
             tmp_client_head_obj.replace_param_value('Content-Length', '3')
 
-        connection.logger.log('*** Fake NTLM header with Msg1:\n=====\n' + tmp_client_head_obj.__repr__())
+        connection.logger.log('*** Fake NTLM header with Msg1:\n=====\n' + tmp_client_head_obj.__repr__().decode())
         connection.logger.log('*** Sending Fake NTLM header (and body) with Msg1...')
         tmp_client_head_obj.send(connection.rserver_socket)
 
@@ -221,7 +221,7 @@ class ntlm_auther:
         connection.logger.log('*** Sending Fake NTLM header (not body) with Msg3...')
         tmp_client_head_obj.send(connection.rserver_socket)
         connection.logger.log('Done.\n')
-        connection.logger.log('*** Fake NTLM header with Msg3:\n=====\n' + tmp_client_head_obj.__repr__())
+        connection.logger.log('*** Fake NTLM header with Msg3:\n=====\n' + tmp_client_head_obj.__repr__().decode())
 
         # upon exit all the remote server variables are reset
         # so new remote server response will be taken by the usual way in connection.run()
@@ -298,7 +298,7 @@ class ntlm_auther:
             connection.logger.log('*** NTLM hashed passwords found.\n')
 
         # Test params
-        if connection.config['NTLM_AUTH'].has_key('NTLM_MODE'):
+        if 'NTLM_MODE' in connection.config['NTLM_AUTH']:
             env['NTLM_MODE'] = int(connection.config['NTLM_AUTH']['NTLM_MODE'])
         else:
             env['NTLM_MODE'] = 0
@@ -335,7 +335,7 @@ class ntlm_auther:
             self.replace_ntlm_with_basic(connection, error_code)
             connection.logger.log("Done.\n")
 
-            connection.logger.log("*** New server's header:\n=====\n" + connection.rserver_head_obj.__repr__())
+            connection.logger.log("*** New server's header:\n=====\n" + connection.rserver_head_obj.__repr__().decode())
 
             return 0
 

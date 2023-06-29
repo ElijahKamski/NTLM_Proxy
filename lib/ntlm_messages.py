@@ -64,8 +64,8 @@ def create_message1(environment_dict):
     smthg2 = '0\000\000\000'  # something with chr(48) lenght?
 
     msg1 = protocol + type + zeros1 + flags + zeros2 + zeros3 + smthg1 + smthg2
-    msg1 = base64.encodestring(msg1)
-    msg1 = msg1.replace('\012', '')
+    msg1 = base64.b64encode(msg1.encode())
+    msg1 = msg1.replace('\012'.encode(), ''.encode())
 
     return msg1
 
@@ -130,7 +130,7 @@ def create_message3(nonce, environment_dict):
         m3 = m3 + additional_rec.data
 
     # base64 encode
-    m3 = base64.encodestring(m3)
+    m3 = base64.b64encode(m3.encode())
     m3 = m3.replace('\012', '')
 
     return m3
@@ -201,7 +201,7 @@ def unknown_part(bin_str):
 # ---------------------------------------------------------------------
 def debug_message1(msg):
     """"""
-    m_ = base64.decodestring(msg)
+    m_ = base64.b64decode(msg)
     m_hex = utils.str2hex(m_)
 
     res = ''
@@ -240,7 +240,7 @@ def debug_message1(msg):
 # ---------------------------------------------------------------------
 def debug_message2(msg):
     """"""
-    m_ = base64.decodestring(msg)
+    m_ = base64.b64decode(msg)
     m_hex = utils.str2hex(m_)
     res = ''
     res = res + '==============================================================\n'

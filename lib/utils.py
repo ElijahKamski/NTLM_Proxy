@@ -32,7 +32,7 @@ def str2hex_num(str):
 # --------------------------------------------------------------------------------------------
 def str2hex(str, delimiter=''):
     res = ''
-    for i in str:
+    for i in str.decode():
         res = res + hd[ord(i) // 16]
         res = res + hd[ord(i) - ((ord(i) // 16) * 16)]
         res = res + delimiter
@@ -42,7 +42,7 @@ def str2hex(str, delimiter=''):
 # --------------------------------------------------------------------------------------------
 def str2dec(str, delimiter=''):
     res = ''
-    for i in str:
+    for i in str.decode():
         res = res + '%3d' % ord(i)
         res = res + delimiter
     return res
@@ -60,7 +60,7 @@ def hex2str(hex_str):
 def str2prn_str(bin_str, delimiter=''):
     ""
     res = ''
-    for i in bin_str:
+    for i in bin_str.decode():
         if ord(i) > 31:
             res = res + i
         else:
@@ -73,7 +73,7 @@ def str2prn_str(bin_str, delimiter=''):
 def byte2bin_str(char):
     ""
     res = ''
-    t = ord(char)
+    t = char
     while t > 0:
         t1 = t / 2
         if t != 2 * t1:
@@ -111,7 +111,7 @@ def int2chrs(number_int):
 # --------------------------------------------------------------------------------------------
 def bytes2int(bytes):
     ""
-    return ord(bytes[1]) * 256 + ord(bytes[0])
+    return bytes[1] * 256 + bytes[0]
 
 
 # --------------------------------------------------------------------------------------------

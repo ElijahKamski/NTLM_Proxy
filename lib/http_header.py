@@ -41,7 +41,7 @@ def test_client_http_header(header_str):
 # tests server's response header for correctness
 def test_server_http_header(header_str):
     ""
-    response = header_str.encode().split('\012'.encode())[0]
+    response = header_str.split('\012'.encode())[0]
     parts = response.split()
 
     # we have to have at least 2 words in the response
@@ -56,16 +56,16 @@ def test_server_http_header(header_str):
 def extract_http_header_str(buffer):
     ""
     # let's remove possible leading newlines
-    t = buffer.lstrip()
+    t = buffer.lstrip().encode() if isinstance(buffer, str) else buffer.lstrip()
 
     # searching for the RFC header's end
     delimiter = '\015\012\015\012'.encode()
-    header_end = t.encode().find(delimiter)
+    header_end = t.find(delimiter)
 
     if header_end < 0:
         # may be it is defective header made by junkbuster
         delimiter = '\012\012'.encode()
-        header_end = t.encode().find(delimiter)
+        header_end = t.find(delimiter)
 
     if header_end >= 0:
         # we have found it, possibly
@@ -147,7 +147,7 @@ class HTTP_HEAD:
 
         self.head_source = head_str
         head_str = head_str.strip()
-        records = head_str.encode().split('\012'.encode())
+        records = head_str.split('\012'.encode())
 
         # Dealing with response line
         # fields = string.split(records[0], ' ', 2)
@@ -162,7 +162,7 @@ class HTTP_HEAD:
         params = {}
         order_list = []
         for i in records[1:]:
-            parts = i.strip().split(':'.encode(), 1)
+            parts = i.decode().strip().split(':', 1)
             pname = parts[0].strip().lower()
             if pname not in params:
                 params[pname] = []
@@ -201,6 +201,7 @@ class HTTP_HEAD:
     def get_param_values(self, param_name):
         ""
         param_name = param_name.lower()
+        print("Params:", self.params)
         if param_name in self.params:
             return self.params[param_name]
         else:
@@ -266,7 +267,7 @@ class HTTP_HEAD:
         # """
         res = ''
         cookies = ''
-        res = ' '.join(self.fields) + '\015\012'
+        res = ' '.encode().join(self.fields) + '\015\012'.encode()
 
         for i in self.order_list:
             if i in self.params:
@@ -275,9 +276,13 @@ class HTTP_HEAD:
                         cookies = cookies + capitalize_value_name(i) + ': ' + k + '\015\012'
                 else:
                     for k in self.params[i]:
-                        res = res + capitalize_value_name(i) + ': ' + k + '\015\012'
-        res = res + cookies
-        res = res + '\015\012'
+                        res += capitalize_value_name(i).encode() if isinstance(capitalize_value_name(i),
+                                                                               str) else capitalize_value_name(i)
+                        res += ': '.encode()
+                        res += k.encode() if isinstance(k, str) else k
+                        res += '\015\012'.encode()
+        res = res + cookies.encode()
+        res = res + '\015\012'.encode()
         # """
         # res = self.__repr__('\015\012')
         # NOTE!!! 0.9.1 worked, 0.9.5 and 0.9.7 did not with MSN Messenger.
@@ -344,7 +349,7 @@ class HTTP_CLIENT_HEAD(HTTP_HEAD):
         net_location = url_tuple[1]
         self.replace_param_value('Host', net_location)
 
-        path = urlparse.urlunparse(tuple(['', ''] + list(url_tuple[2:])))
+        path = urlparse.urlunparse(tuple([''.encode(), ''.encode()] + list(url_tuple[2:])))
         self.set_http_url(path)
 
     # -------------------------------
