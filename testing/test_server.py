@@ -1,7 +1,9 @@
 import socket
 from threading import Thread
-from ntlm_auth.ntlm import NtlmContext
 from urllib.parse import urlparse
+
+from ntlm_auth.ntlm import NtlmContext
+
 
 def handle_client(client_socket):
     request_data = client_socket.recv(4096)
