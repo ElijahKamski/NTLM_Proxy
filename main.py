@@ -40,17 +40,21 @@ class MainWindowNTLM(QMainWindow, main_window.Ui_MainWindow):
         self.conf['NTLM_AUTH']['USER'] = parsed_config['login']
         self.conf['NTLM_AUTH']['PASSWORD'] = parsed_config['password']
         self.conf['GENERAL']['VERSION'] = '0.9.9.0.1'
-        config_result = config_affairs.arrange(self.conf)
+        if (self.conf['GENERAL']['PARENT_PROXY'].strip()):
+            config_result = config_affairs.arrange(self.conf)
 
-        # --------------------------------------------------------------
-        # let's run it
+            # --------------------------------------------------------------
+            # let's run it
 
-        serv = server.AuthProxyServer(config_result)
+            serv = server.AuthProxyServer(config_result)
 
-        signal.signal(signal.SIGINT, serv.sigHandler)
+            signal.signal(signal.SIGINT, serv.sigHandler)
 
-        threading.Thread(target=serv.run).start()
-        self.pop_up = dialog_window_wrapper.DialogWindow(self.conf['GENERAL']['LISTEN_PORT'])
+            threading.Thread(target=serv.run).start()
+            self.pop_up = dialog_window_wrapper.DialogWindow(self.conf['GENERAL']['LISTEN_PORT'])
+        else:
+            self.pop_up = dialog_window_wrapper.DialogWindow(is_bypass=True)
+
         self.pop_up.show()
 
 
