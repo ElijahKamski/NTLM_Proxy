@@ -93,7 +93,7 @@ class MD4:
 
         # --NON ASCII COMMENT ELIDED--
         if (int(self.len1 + (ilen << 3)) < int(self.len1)):
-            self.len2 = self.len2 + U32(1)
+            self.len2 = self.len2 + int(U32(1))
 
         self.len1 = self.len1 + (ilen << 3)
         self.len2 = self.len2 + (ilen >> 29)
@@ -102,7 +102,7 @@ class MD4:
 
         L = U32(0)
         bufpos = 0
-        while (int(ilen) > 0):
+        while int(ilen) > 0:
             if (64 - int(self.count)) < int(ilen):
                 L = U32(64 - int(self.count))
             else:
@@ -113,7 +113,7 @@ class MD4:
             bufpos = bufpos + int(L)
 
             # print self.count, L, ilen
-            if (int(self.count) == 64):
+            if int(self.count) == 64:
                 self.count = U32(0)
                 X = []
                 i = 0
@@ -197,7 +197,7 @@ class MD4:
 
         oldlen1 = temp.len1
         oldlen2 = temp.len2
-        if (56 <= int(self.count)):
+        if 56 <= int(self.count):
             padlen = U32(56 - int(self.count) + 64)
         else:
             padlen = U32(56 - int(self.count))
@@ -205,12 +205,12 @@ class MD4:
         temp.update(int_array2str(padding[:int(padlen)]))
         # print temp
 
-        s[0] = (oldlen1) & U32(0xFF)
-        s[1] = ((oldlen1) >> 8) & U32(0xFF)
-        s[2] = ((oldlen1) >> 16) & U32(0xFF)
-        s[3] = ((oldlen1) >> 24) & U32(0xFF)
-        s[4] = (oldlen2) & U32(0xFF)
-        s[5] = ((oldlen2) >> 8) & U32(0xFF)
+        s[0] = oldlen1 & U32(0xFF)
+        s[1] = (oldlen1 >> 8) & U32(0xFF)
+        s[2] = (oldlen1 >> 16) & U32(0xFF)
+        s[3] = (oldlen1 >> 24) & U32(0xFF)
+        s[4] = oldlen2 & U32(0xFF)
+        s[5] = (oldlen2 >> 8) & U32(0xFF)
         s[6] = ((oldlen2) >> 16) & U32(0xFF)
         s[7] = ((oldlen2) >> 24) & U32(0xFF)
         temp.update(int_array2str(s))
@@ -262,7 +262,7 @@ def f3(a, b, c, d, k, s, X): return ROL(a + H(b, c, d) + X[k] + U32(0x6ed9eba1),
 def int_array2str(array):
     str = ''
     for i in array:
-        str = str + chr(i)
+        str = str + chr(int(i))
     return str
 
 

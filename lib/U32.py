@@ -105,11 +105,19 @@ class U32:
 
     def __lshift__(self, b):
         r = U32()
+        if isinstance(b, self.__class__):
+            r.v = C + norm(self.v << b.v)
+        else:
+            r.v = C + norm(self.v << b)
         r.v = C + norm(self.v << b)
         return r
 
     def __rshift__(self, b):
         r = U32()
+        if isinstance(b, self.__class__):
+            r.v = C + norm(self.v >> b.v)
+        else:
+            r.v = C + norm(self.v >> b)
         r.v = C + (norm(self.v) >> b)
         return r
 
