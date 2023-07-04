@@ -1,7 +1,7 @@
 server_config = {'GENERAL':
                      {'LISTEN_PORT': '5865',
-                      'PARENT_PROXY': '127.0.0.1',
-                      'PARENT_PROXY_PORT': '1254',
+                      'PARENT_PROXY': '',
+                      'PARENT_PROXY_PORT': '',
                       'PARENT_PROXY_TIMEOUT': '15',
                       'ALLOW_EXTERNAL_CLIENTS': '0',
                       'FRIENDLY_IPS': '',

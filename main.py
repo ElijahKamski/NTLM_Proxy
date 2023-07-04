@@ -53,7 +53,9 @@ class MainWindowNTLM(QMainWindow, main_window.Ui_MainWindow):
             threading.Thread(target=serv.run).start()
             self.pop_up = dialog_window_wrapper.DialogWindow(self.conf['GENERAL']['LISTEN_PORT'])
         else:
-            self.pop_up = dialog_window_wrapper.DialogWindow(is_bypass=True)
+            self.conf['GENERAL']['PARENT_PROXY'] = '0.0.0.0'
+            self.conf['GENERAL']['PARENT_PROXY_PORT'] = 80
+            self.pop_up = dialog_window_wrapper.DialogWindow(self.conf['GENERAL']['LISTEN_PORT'])
 
         self.pop_up.show()
 
