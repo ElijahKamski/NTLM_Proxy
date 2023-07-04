@@ -95,7 +95,8 @@ class www_HTTP_Client(proxy_client.proxy_HTTP_Client):
         # End of doubtable code.
 
         # Show reworked header.
-        self.logger.log('*** New client header:\n=====\n' + self.client_head_obj.__repr__())
+        self.logger.log('*** New client header:\n=====\n' + self.client_head_obj.__repr__() if isinstance(
+            self.client_head_obj.__repr__(), str) else self.client_head_obj.__repr__().decode())
 
     # -----------------------------------------------------------------------
     def check_connected_remote_server(self):
