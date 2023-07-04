@@ -18,7 +18,6 @@
 #
 from lib import proxy_client
 import getpass
-import signal
 import socket
 import sys
 import threading
@@ -61,7 +60,7 @@ class AuthProxyServer:
 
     # --------------------------------------------------------------
     def run(self):
-        signal.signal(signal.SIGINT, self.sigHandler)
+        # signal.signal(signal.SIGINT, self.sigHandler)
         if self.config['GENERAL']['PARENT_PROXY'] and self.config['GENERAL']['AVAILABLE_PROXY_LIST']:
             self.watchUpstream = 1
             self.monitor = monitor_upstream.monitorThread(self.config, signal.SIGINT)

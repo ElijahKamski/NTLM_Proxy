@@ -2,6 +2,7 @@
 
 import sys
 import threading
+import signal
 
 from PySide6.QtWidgets import QMainWindow, QApplication
 
@@ -39,25 +40,20 @@ class MainWindowNTLM(QMainWindow, main_window.Ui_MainWindow):
         self.conf['NTLM_AUTH']['USER'] = parsed_config['login']
         self.conf['NTLM_AUTH']['PASSWORD'] = parsed_config['password']
         self.conf['GENERAL']['VERSION'] = '0.9.9.0.1'
-        threading.Thread(target=self.run_proxy).start()
-        self.pop_up = dialog_window_wrapper.DialogWindow(self.conf['GENERAL']['LISTEN_PORT'])
-        self.pop_up.show()
-
-    def run_proxy(self):
-        # --------------------------------------------------------------
-        # config affairs
-        # look for default config name in lib/config.py
-        # --------------------------------------------------------------
-        print('NTLM authorization Proxy Server v%s' % self.conf['GENERAL']['VERSION'])
-        print('Copyright (C) 2001-2004 by Dmitry Rozmanov and others.')
-
         config_result = config_affairs.arrange(self.conf)
 
         # --------------------------------------------------------------
         # let's run it
 
         serv = server.AuthProxyServer(config_result)
-        serv.run()
+
+        signal.signal(signal.SIGINT, serv.sigHandler)
+
+        threading.Thread(target=serv.run).start()
+        self.pop_up = dialog_window_wrapper.DialogWindow(self.conf['GENERAL']['LISTEN_PORT'])
+        self.pop_up.show()
+
+
 
 
 if __name__ == "__main__":
