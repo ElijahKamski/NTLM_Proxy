@@ -20,6 +20,7 @@ from lib import proxy_client
 import getpass
 import socket
 import sys
+import signal
 import threading
 
 from lib import monitor_upstream

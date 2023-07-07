@@ -36,30 +36,23 @@ class MainWindowNTLM(QMainWindow, main_window.Ui_MainWindow):
         self.conf = config.server_config
         self.conf['GENERAL']['PARENT_PROXY'] = parsed_config['url']
         self.conf['GENERAL']['PARENT_PROXY_PORT'] = parsed_config['port']
-        self.conf['NTLM_AUTH']['NT_DOMAIN'] = parsed_config['domain']
+        self.conf['NTLM_AUTH']['NT_DOMAIN'] = parsed_config['domain'] if parsed_config['domain'] else "some"
         self.conf['NTLM_AUTH']['USER'] = parsed_config['login']
-        self.conf['NTLM_AUTH']['PASSWORD'] = parsed_config['password']
+        self.conf['NTLM_AUTH']['PASSWORD'] = parsed_config['password'] if parsed_config['password'] else "NO_PASS"
         self.conf['GENERAL']['VERSION'] = '0.9.9.0.1'
-        if (self.conf['GENERAL']['PARENT_PROXY'].strip()):
-            config_result = config_affairs.arrange(self.conf)
+        config_result = config_affairs.arrange(self.conf)
 
-            # --------------------------------------------------------------
-            # let's run it
+        # --------------------------------------------------------------
+        # let's run it
 
-            serv = server.AuthProxyServer(config_result)
+        serv = server.AuthProxyServer(config_result)
 
-            signal.signal(signal.SIGINT, serv.sigHandler)
+        signal.signal(signal.SIGINT, serv.sigHandler)
 
-            threading.Thread(target=serv.run).start()
-            self.pop_up = dialog_window_wrapper.DialogWindow(self.conf['GENERAL']['LISTEN_PORT'])
-        else:
-            self.conf['GENERAL']['PARENT_PROXY'] = '0.0.0.0'
-            self.conf['GENERAL']['PARENT_PROXY_PORT'] = 80
-            self.pop_up = dialog_window_wrapper.DialogWindow(self.conf['GENERAL']['LISTEN_PORT'])
+        threading.Thread(target=serv.run).start()
+        self.pop_up = dialog_window_wrapper.DialogWindow(self.conf['GENERAL']['LISTEN_PORT'])
 
         self.pop_up.show()
-
-
 
 
 if __name__ == "__main__":

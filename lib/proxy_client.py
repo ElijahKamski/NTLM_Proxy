@@ -260,7 +260,7 @@ class proxy_HTTP_Client:
             socket_data = ''
 
         if socket_data:
-            self.logger_bin_client.log(socket_data.decode())
+            self.logger_bin_client.log(socket_data.decode("UTF-8"))
 
         self.client_buffer = self.client_buffer + (
             socket_data.decode() if isinstance(socket_data, bytes) else socket_data)

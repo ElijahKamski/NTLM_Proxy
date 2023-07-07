@@ -5,7 +5,7 @@ server_config = {'GENERAL':
                       'PARENT_PROXY_TIMEOUT': '15',
                       'ALLOW_EXTERNAL_CLIENTS': '0',
                       'FRIENDLY_IPS': '',
-                      'URL_LOG': '0',
+                      'URL_LOG': '1',
                       'MAX_CONNECTION_BACKLOG': '5',
                       'VERSION': '0.9.9.0.1'
                       },
@@ -23,7 +23,7 @@ server_config = {'GENERAL':
                       'NT_PART': '0',
                       'NTLM_FLAGS': '06820000',
                       'NTLM_TO_BASIC': '0'},
-                 'DEBUG': {'DEBUG': '0',
-                           'BIN_DEBUG': '0',
-                           'SCR_DEBUG': '0',
-                           'AUTH_DEBUG': '0'}}
+                 'DEBUG': {'DEBUG': '1',
+                           'BIN_DEBUG': '1',
+                           'SCR_DEBUG': '1',
+                           'AUTH_DEBUG': '1'}}
